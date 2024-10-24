@@ -2,6 +2,8 @@ package com.pm.binomtech_test
 
 import android.Manifest
 import android.content.pm.*
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.location.*
 import android.os.*
 import android.widget.Toast
@@ -55,8 +57,11 @@ class MainActivity : ComponentActivity(), IMyLocationProvider {
     }
 
     private fun setupMap() {
+
         mapView = findViewById(R.id.mapview)
         mapView!!.isClickable = true
+        mapView!!.setMultiTouchControls(true)
+        mapView!!.setBuiltInZoomControls(false)
         mapView!!.controller.setZoom(15.0)
         mapView!!.controller.setCenter(GeoPoint(54.733334, 56.0))
         mapView!!.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
@@ -87,6 +92,7 @@ class MainActivity : ComponentActivity(), IMyLocationProvider {
             override fun onLocationResult(locationResult: LocationResult) {
                 if (locationResult.locations.isNotEmpty()) {
                     lastLocation = locationResult.lastLocation
+                    lastLocation?.removeBearing()
                     locConsumer?.onLocationChanged(lastLocation, this@MainActivity)
                 }
             }
@@ -99,9 +105,16 @@ class MainActivity : ComponentActivity(), IMyLocationProvider {
         locationRunning = true
 
         // Marker
+        val myLocBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(resources, R.drawable.my_location), 100, 100, false)
         val oMapLocationOverlay = MyLocationNewOverlay(this, mapView)
+        oMapLocationOverlay.isDrawAccuracyEnabled = false
+        oMapLocationOverlay.setPersonIcon(myLocBitmap)
+        oMapLocationOverlay.setDirectionIcon(myLocBitmap)
         oMapLocationOverlay.enableFollowLocation()
         oMapLocationOverlay.enableMyLocation()
+        oMapLocationOverlay.setPersonAnchor(0.5f, 0.5f)
+        oMapLocationOverlay.setDirectionAnchor(0.5f, 0.5f)
+
         mapView!!.overlays.add(oMapLocationOverlay)
     }
 
