@@ -9,7 +9,10 @@ import android.graphics.drawable.*
 import android.location.*
 import android.os.*
 import android.view.Gravity
+import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
@@ -48,6 +51,7 @@ class MainActivity : ComponentActivity(), IMyLocationProvider {
         allMarkers = listOf(
             BinomMarker(
                 loc = Utils.locationByLatLng(54.7497331,55.9993335),
+                dispName = "Артём",
                 dispNetworkType = "GPS",
                 dispDate = "01.01.24",
                 dispTime = "12:15",
@@ -55,6 +59,7 @@ class MainActivity : ComponentActivity(), IMyLocationProvider {
             ),
             BinomMarker(
                 loc = Utils.locationByLatLng(54.7393646,55.9569262),
+                dispName = "Илья",
                 dispNetworkType = "GPS",
                 dispDate = "02.07.17",
                 dispTime = "14:00",
@@ -62,6 +67,7 @@ class MainActivity : ComponentActivity(), IMyLocationProvider {
             ),
             BinomMarker(
                 loc = Utils.locationByLatLng(54.7739054,56.0611441),
+                dispName = "Иван",
                 dispNetworkType = "Cellular",
                 dispDate = "05.07.25",
                 dispTime = "12:00",
@@ -72,6 +78,7 @@ class MainActivity : ComponentActivity(), IMyLocationProvider {
         setupMap()
         setupMarkers()
         checkPermissionsState()
+        updateLowerUI()
     }
 
     private fun checkPermissionsState() {
@@ -221,6 +228,20 @@ class MainActivity : ComponentActivity(), IMyLocationProvider {
         oMapLocationOverlay.setPersonAnchor(0.5f, 0.5f)
         oMapLocationOverlay.setDirectionAnchor(0.5f, 0.5f)
         mapView!!.overlays.add(oMapLocationOverlay)
+    }
+
+    private fun updateLowerUI() {
+        if (selectedMarkerIdx < 0 || selectedMarkerIdx > (allMarkers.size - 1)) {
+            findViewById<LinearLayout>(R.id.llInfoBlock).visibility = View.GONE
+        } else {
+            val bm = allMarkers[selectedMarkerIdx]
+            findViewById<LinearLayout>(R.id.llInfoBlock).visibility = View.VISIBLE
+            findViewById<ImageView>(R.id.ivInfoImage).setImageBitmap(BitmapFactory.decodeStream(assets.open(bm.iconAsset)))
+            findViewById<TextView>(R.id.tvInfoName).text = bm.dispName
+            findViewById<TextView>(R.id.tvInfoNetwork).text = bm.dispNetworkType
+            findViewById<TextView>(R.id.tvInfoDate).text = bm.dispDate
+            findViewById<TextView>(R.id.tvInfoTime).text = bm.dispTime
+        }
     }
 
     override fun onPause() {

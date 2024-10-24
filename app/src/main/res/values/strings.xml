@@ -3,4 +3,5 @@
     <string name="loc_permission_required">Для определения местоположения необходимо разрешение.</string>
     <string name="wait_location">Дождитесь пока местоположение будет определено.</string>
     <string name="select_marker">Выберите маркер на карте.</string>
+    <string name="view_history">Посмотреть историю</string>
 </resources>
