@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">binomtech_test</string>
+    <string name="loc_permission_required">Для определения местоположения необходимо разрешение.</string>
 </resources>
