@@ -5,6 +5,7 @@ import android.content.pm.*
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Rect
 import android.graphics.drawable.*
 import android.location.*
 import android.os.*
@@ -165,18 +166,14 @@ class MainActivity : ComponentActivity(), IMyLocationProvider {
         }
 
         // Add New
-        val markerIcon: Drawable = ContextCompat.getDrawable(this, R.drawable.marker)!!
+        val markerIcon: Bitmap = Bitmap.createScaledBitmap(Utils.getBitmap(this, R.drawable.marker)!!, toPx(160).toInt(), toPx(160).toInt(), true)!!  // TODO: handle load error
         var idx = 0
         for (bm: BinomMarker in allMarkers) {
-            val bIcon: Drawable = BitmapDrawable(Utils.getCroppedBitmap(BitmapFactory.decodeStream(assets.open(bm.iconAsset)))) // TODO: handle load error
-            val finalDrawable = LayerDrawable(arrayOf(markerIcon, bIcon))
-            finalDrawable.setLayerGravity(1, Gravity.CENTER_HORIZONTAL)
-            finalDrawable.setLayerWidth(1, toPx(54).toInt())
-            finalDrawable.setLayerHeight(1, toPx(54).toInt())
-            finalDrawable.setLayerInsetTop(1, toPx(3).toInt())
+            val bIcon: Bitmap = Utils.getCroppedBitmap(BitmapFactory.decodeStream(assets.open(bm.iconAsset))) // TODO: handle load error
+            val finalDrawable = Utils.combineBitmaps(markerIcon, bIcon, Rect(toPx(15).toInt(), toPx(6).toInt(), toPx(145).toInt(), toPx(135).toInt()))
             val mk = Marker(mapView)
             mk.position = GeoPoint(bm.loc.latitude, bm.loc.longitude)
-            mk.icon = finalDrawable
+            mk.icon = BitmapDrawable(finalDrawable)
             mk.image = ColorDrawable(Color.TRANSPARENT)
             val idxSnapshot = idx + 0
             mk.setOnMarkerClickListener { marker, _ ->
@@ -236,7 +233,7 @@ class MainActivity : ComponentActivity(), IMyLocationProvider {
         } else {
             val bm = allMarkers[selectedMarkerIdx]
             findViewById<LinearLayout>(R.id.llInfoBlock).visibility = View.VISIBLE
-            findViewById<ImageView>(R.id.ivInfoImage).setImageBitmap(BitmapFactory.decodeStream(assets.open(bm.iconAsset)))
+            findViewById<ImageView>(R.id.ivInfoImage).setImageBitmap(Utils.getCroppedBitmap(BitmapFactory.decodeStream(assets.open(bm.iconAsset))))
             findViewById<TextView>(R.id.tvInfoName).text = bm.dispName
             findViewById<TextView>(R.id.tvInfoNetwork).text = bm.dispNetworkType
             findViewById<TextView>(R.id.tvInfoDate).text = bm.dispDate
